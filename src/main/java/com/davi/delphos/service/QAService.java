@@ -34,7 +34,8 @@ public class QAService {
     public List<SistemaQA> carregarSistemas() {
         if (Files.exists(ARQUIVO)) {
             try (BufferedReader ler = Files.newBufferedReader(ARQUIVO, UTF_8)) {
-                List<SistemaQA> sistemas = gson.fromJson(ler, new TypeToken<List<SistemaQA>>() {}.getType()
+                List<SistemaQA> sistemas = gson.fromJson(ler, new TypeToken<List<SistemaQA>>() {
+                        }.getType()
                 );
 
                 return sistemas != null ? sistemas : new ArrayList<>();
@@ -52,7 +53,7 @@ public class QAService {
         if (nomeSistema == null || nomeSistema.isBlank()) {
             throw new IllegalArgumentException("Sistema inválido");
         }
-        if (versao == null || versao.isBlank()){
+        if (versao == null || versao.isBlank()) {
             throw new IllegalArgumentException("Versão inválida");
         }
 
@@ -73,11 +74,42 @@ public class QAService {
                 });
 
         Optional<TesteQA> existe = versaoOpt.buscarTeste(teste.getId());
-        if (existe.isPresent()){
+        if (existe.isPresent()) {
             versaoOpt.removerTeste(teste.getId());
             teste.atualizarDataEdicao();
         }
         versaoOpt.adicionarTeste(teste);
+        salvarSistemas(sistemas);
+        return sistemas;
+    }
+
+    public List<SistemaQA> excluirTeste(List<SistemaQA> sistemas, String nomeSistema, String versao, String idTeste) throws IOException {
+
+        Optional<SistemaQA> sistemaOpt = sistemas.stream()
+                .filter(s -> s.getNome().equalsIgnoreCase(nomeSistema))
+                .findFirst();
+
+        if (sistemaOpt.isEmpty()) {
+            return sistemas;
+        }
+
+        SistemaQA sistemaEncontrado = sistemaOpt.get();
+
+        Optional<VersaoQA> versaoOpt = sistemaEncontrado.buscarVersao(nomeSistema);
+        if (versaoOpt.isEmpty()) {
+            return sistemas;
+        }
+        VersaoQA versaoEncontrada = versaoOpt.get();
+        versaoEncontrada.removerTeste(idTeste);
+
+        if (versaoEncontrada.getTestes().isEmpty()){
+            sistemaEncontrado.removerVersao(versaoEncontrada.getVersao());
+        }
+
+        if (sistemaEncontrado.getVersoes().isEmpty()){
+            sistemas.removeIf(s -> s.getNome().equalsIgnoreCase(nomeSistema));
+        }
+
         salvarSistemas(sistemas);
         return sistemas;
     }
