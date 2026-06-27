@@ -1,20 +1,20 @@
-package com.davi.delphos.model;
+package com.davi.specbox.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class VersaoQA {
+public class Versoes {
     private String versao;
-    private List<TesteQA> listaTestes;
+    private List<Testes> listaTestes;
 
-    public VersaoQA(String versao) {
+    public Versoes(String versao) {
         this.versao = versao;
         listaTestes = new ArrayList<>();
     }
 
-    public void adicionarTeste(TesteQA teste) {
+    public void adicionarTeste(Testes teste) {
         if (teste != null) {
             listaTestes.add(teste);
         }
@@ -24,7 +24,7 @@ public class VersaoQA {
         listaTestes.removeIf(testes -> testes.getId().equals(id));
     }
 
-    public Optional<TesteQA> buscarTeste(String id) {
+    public Optional<Testes> buscarTeste(String id) {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("ID inválido");
         }
@@ -47,11 +47,11 @@ public class VersaoQA {
         this.versao = versao;
     }
 
-    public List<TesteQA> getTestes() {
+    public List<Testes> getTestes() {
         return listaTestes;
     }
 
-    public void setTestes(List<TesteQA> testes) {
+    public void setTestes(List<Testes> testes) {
         this.listaTestes = testes;
     }
 }

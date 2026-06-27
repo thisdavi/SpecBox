@@ -1,19 +1,19 @@
-package com.davi.delphos.model;
+package com.davi.specbox.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class SistemaQA {
+public class Sistemas {
     private String nome;
-    private List<VersaoQA> versoes;
+    private List<Versoes> versoes;
 
-    public SistemaQA(String nome) {
+    public Sistemas(String nome) {
         this.nome = nome;
         versoes = new ArrayList<>();
     }
 
-    public void adicionarVersao(VersaoQA versao) {
+    public void adicionarVersao(Versoes versao) {
         if (versao != null) {
             versoes.add(versao);
         }
@@ -23,7 +23,7 @@ public class SistemaQA {
         versoes.removeIf(versao -> versao.getVersao().equalsIgnoreCase(nomeVersao));
     }
 
-    public Optional<VersaoQA> buscarVersao(String versao) {
+    public Optional<Versoes> buscarVersao(String versao) {
         if (versao == null || versao.isBlank()) {
             throw new IllegalArgumentException("Versão inválida");
         }
@@ -38,11 +38,11 @@ public class SistemaQA {
         return nome;
     }
 
-    public List<VersaoQA> getVersoes() {
+    public List<Versoes> getVersoes() {
         return versoes;
     }
 
-    public void setVersoes(List<VersaoQA> versoes) {
+    public void setVersoes(List<Versoes> versoes) {
         this.versoes = versoes;
     }
 

@@ -1,10 +1,10 @@
-package com.davi.delphos.model;
+package com.davi.specbox.model;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-public class TesteQA {
+public class Testes {
     public enum Resultado {
         APROVADO, REPROVADO, PARCIAL
     }
@@ -30,11 +30,11 @@ public class TesteQA {
     private Ambiente ambiente;
     private Prioridade prioridade;
     private String responsavel;
-    private String notas;
+    private String obs;
     private final String dataCriacao;
     private String dataEdicao;
 
-    public TesteQA(String titulo) {
+    public Testes(String titulo) {
         id = UUID.randomUUID().toString();
         this.titulo = titulo;
         dataCriacao = getDataFormatada();
@@ -131,12 +131,12 @@ public class TesteQA {
         this.responsavel = responsavel;
     }
 
-    public String getNotas() {
-        return notas;
+    public String getObs() {
+        return obs;
     }
 
-    public void setNotas(String notas) {
-        this.notas = notas;
+    public void setObs(String obs) {
+        this.obs = obs;
     }
 
     public String getDataEdicao() {

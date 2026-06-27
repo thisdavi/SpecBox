@@ -1,8 +1,8 @@
-package com.davi.delphos.service;
+package com.davi.specbox.service;
 
-import com.davi.delphos.model.SistemaQA;
-import com.davi.delphos.model.TesteQA;
-import com.davi.delphos.model.VersaoQA;
+import com.davi.specbox.model.Sistemas;
+import com.davi.specbox.model.Testes;
+import com.davi.specbox.model.Versoes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -18,23 +18,26 @@ import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class QAService {
-    private static final Path PASTA = Path.of(System.getProperty("user.home"), ".delphosqa");
-    private static final Path ARQUIVO = PASTA.resolve("qa_testes.json");
+public class SpecBoxService {
+    private static final Path PASTA = Path.of(System.getProperty("user.home"), ".specbox");
+    private static final Path ARQUIVO = PASTA.resolve("specbox_testes.json");
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public void salvarSistemas(List<SistemaQA> sistemas) throws IOException {
-        Files.createDirectories(PASTA);
-
-        try (BufferedWriter escritor = Files.newBufferedWriter(ARQUIVO, UTF_8)) {
-            escritor.write(gson.toJson(sistemas));
+    public void salvarSistemas(List<Sistemas> sistemas) {
+        try {
+            Files.createDirectories(PASTA);
+            try (BufferedWriter escritor = Files.newBufferedWriter(ARQUIVO, UTF_8)) {
+                escritor.write(gson.toJson(sistemas));
+            }
+        } catch (IOException ioException) {
+            System.out.println("Erro ao salvar sistema: " + ioException.getMessage());
         }
     }
 
-    public List<SistemaQA> carregarSistemas() {
+    public List<Sistemas> carregarSistemas() {
         if (Files.exists(ARQUIVO)) {
             try (BufferedReader ler = Files.newBufferedReader(ARQUIVO, UTF_8)) {
-                List<SistemaQA> sistemas = gson.fromJson(ler, new TypeToken<List<SistemaQA>>() {
+                List<Sistemas> sistemas = gson.fromJson(ler, new TypeToken<List<Sistemas>>() {
                         }.getType()
                 );
 
@@ -47,7 +50,7 @@ public class QAService {
         return new ArrayList<>();
     }
 
-    public List<SistemaQA> salvarTeste(List<SistemaQA> sistemas, String nomeSistema, String versao, TesteQA
+    public List<Sistemas> salvarTeste(List<Sistemas> sistemas, String nomeSistema, String versao, Testes
             teste) throws IOException {
 
         if (nomeSistema == null || nomeSistema.isBlank()) {
@@ -57,23 +60,23 @@ public class QAService {
             throw new IllegalArgumentException("Versão inválida");
         }
 
-        SistemaQA sistemaOpt = sistemas.stream()
+        Sistemas sistemaOpt = sistemas.stream()
                 .filter(s -> s.getNome().equalsIgnoreCase(nomeSistema))
                 .findFirst()
                 .orElseGet(() -> {
-                    SistemaQA sistemaNovo = new SistemaQA(nomeSistema);
+                    Sistemas sistemaNovo = new Sistemas(nomeSistema);
                     sistemas.add(sistemaNovo);
                     return sistemaNovo;
                 });
 
-        VersaoQA versaoOpt = sistemaOpt.buscarVersao(versao)
+        Versoes versaoOpt = sistemaOpt.buscarVersao(versao)
                 .orElseGet(() -> {
-                    VersaoQA versaoNova = new VersaoQA(versao);
+                    Versoes versaoNova = new Versoes(versao);
                     sistemaOpt.adicionarVersao(versaoNova);
                     return versaoNova;
                 });
 
-        Optional<TesteQA> existe = versaoOpt.buscarTeste(teste.getId());
+        Optional<Testes> existe = versaoOpt.buscarTeste(teste.getId());
         if (existe.isPresent()) {
             versaoOpt.removerTeste(teste.getId());
             teste.atualizarDataEdicao();
@@ -83,9 +86,9 @@ public class QAService {
         return sistemas;
     }
 
-    public List<SistemaQA> excluirTeste(List<SistemaQA> sistemas, String nomeSistema, String versao, String idTeste) throws IOException {
+    public List<Sistemas> excluirTeste(List<Sistemas> sistemas, String nomeSistema, String versao, String idTeste) throws IOException {
 
-        Optional<SistemaQA> sistemaOpt = sistemas.stream()
+        Optional<Sistemas> sistemaOpt = sistemas.stream()
                 .filter(s -> s.getNome().equalsIgnoreCase(nomeSistema))
                 .findFirst();
 
@@ -93,20 +96,20 @@ public class QAService {
             return sistemas;
         }
 
-        SistemaQA sistemaEncontrado = sistemaOpt.get();
+        Sistemas sistemaEncontrado = sistemaOpt.get();
 
-        Optional<VersaoQA> versaoOpt = sistemaEncontrado.buscarVersao(versao);
+        Optional<Versoes> versaoOpt = sistemaEncontrado.buscarVersao(versao);
         if (versaoOpt.isEmpty()) {
             return sistemas;
         }
-        VersaoQA versaoEncontrada = versaoOpt.get();
+        Versoes versaoEncontrada = versaoOpt.get();
         versaoEncontrada.removerTeste(idTeste);
 
-        if (versaoEncontrada.getTestes().isEmpty()){
+        if (versaoEncontrada.getTestes().isEmpty()) {
             sistemaEncontrado.removerVersao(versaoEncontrada.getVersao());
         }
 
-        if (sistemaEncontrado.getVersoes().isEmpty()){
+        if (sistemaEncontrado.getVersoes().isEmpty()) {
             sistemas.removeIf(s -> s.getNome().equalsIgnoreCase(nomeSistema));
         }
 
