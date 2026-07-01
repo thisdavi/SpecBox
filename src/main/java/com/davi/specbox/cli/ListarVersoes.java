@@ -31,6 +31,12 @@ public class ListarVersoes implements Comando {
 
         Sistema sistema = leitor.escolherDaLista("Escolha o sistema na lista abaixo", sistemaList, Sistema::getNome);
         List<Versao> versoes = sistema.getVersoes();
+        if(versoes.isEmpty()){
+            System.out.println("Nenhum versão cadastrada para esse sistema.\nCadastre uma versão primeiro.");
+            return;
+
+        }
+
         System.out.println("======== Listagem de Versões =========");
         for (Versao versao : versoes) {
             System.out.println("Versão: " + versao.getVersao());
